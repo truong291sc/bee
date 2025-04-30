@@ -17,6 +17,7 @@ function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        console.log('User logged in:', user.uid);
         setUser(user);
         setIsLoggedIn(true);
         // Load transactions for the current user
@@ -26,6 +27,7 @@ function App() {
           orderBy('date', 'desc')
         );
         const unsubscribeTransactions = onSnapshot(q, (snapshot) => {
+          console.log('Transactions updated:', snapshot.docs.length);
           const transactionsData = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -34,6 +36,7 @@ function App() {
         });
         return () => unsubscribeTransactions();
       } else {
+        console.log('User logged out');
         setUser(null);
         setIsLoggedIn(false);
         setTransactions([]);
@@ -44,10 +47,12 @@ function App() {
 
   const handleAddTransaction = async (newTransaction) => {
     try {
-      await addDoc(collection(db, 'transactions'), {
+      console.log('Adding transaction:', newTransaction);
+      const docRef = await addDoc(collection(db, 'transactions'), {
         ...newTransaction,
         userId: user.uid
       });
+      console.log('Transaction added with ID:', docRef.id);
     } catch (error) {
       console.error('Error adding transaction:', error);
     }
@@ -55,7 +60,9 @@ function App() {
 
   const handleDeleteTransaction = async (id) => {
     try {
+      console.log('Deleting transaction:', id);
       await deleteDoc(doc(db, 'transactions', id));
+      console.log('Transaction deleted');
     } catch (error) {
       console.error('Error deleting transaction:', error);
     }
