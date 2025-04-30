@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Box, TextField, Button, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { collection, addDoc, getDocs, deleteDoc, doc, DocumentData } from 'firebase/firestore';
-import { db } from '../firebase';
+import { collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore';
+import { db, auth } from '../firebase';
 
 interface Transaction {
   id: string;
@@ -10,6 +10,7 @@ interface Transaction {
   amount: number;
   description: string;
   date: string;
+  userId: string;
 }
 
 const ExpenseTracker: React.FC = () => {
@@ -23,8 +24,16 @@ const ExpenseTracker: React.FC = () => {
   }, []);
 
   const fetchTransactions = async () => {
-    const querySnapshot = await getDocs(collection(db, 'transactions'));
-    const transactionsData = querySnapshot.docs.map((doc: DocumentData) => ({
+    if (!auth.currentUser) return;
+
+    const q = query(
+      collection(db, 'transactions'),
+      where('userId', '==', auth.currentUser.uid),
+      orderBy('date', 'desc')
+    );
+
+    const querySnapshot = await getDocs(q);
+    const transactionsData = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     })) as Transaction[];
@@ -33,13 +42,14 @@ const ExpenseTracker: React.FC = () => {
 
   const handleAddTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || !description) return;
+    if (!amount || !description || !auth.currentUser) return;
 
     const newTransaction = {
       type,
       amount: Number(amount),
       description,
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
+      userId: auth.currentUser.uid
     };
 
     try {
@@ -48,7 +58,7 @@ const ExpenseTracker: React.FC = () => {
       setDescription('');
       fetchTransactions();
     } catch (error) {
-      console.error('Error adding transaction:', error);
+      console.error('Lỗi thêm giao dịch:', error);
     }
   };
 
@@ -57,7 +67,7 @@ const ExpenseTracker: React.FC = () => {
       await deleteDoc(doc(db, 'transactions', id));
       fetchTransactions();
     } catch (error) {
-      console.error('Error deleting transaction:', error);
+      console.error('Lỗi xóa giao dịch:', error);
     }
   };
 

@@ -4,6 +4,7 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from './firebase';
 import Login from './components/Login';
 import ExpenseTracker from './components/ExpenseTracker';
+import { Box, Typography } from '@mui/material';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
@@ -19,7 +20,19 @@ function App() {
   }, []);
 
   if (loading) {
-    return <div>Đang tải...</div>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+          bgcolor: '#f5f5f5'
+        }}
+      >
+        <Typography>Đang tải...</Typography>
+      </Box>
+    );
   }
 
   return (
