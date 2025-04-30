@@ -15,7 +15,8 @@ function App() {
     const newExpense = {
       id: Date.now(),
       description,
-      amount: parseFloat(amount)
+      amount: parseFloat(amount),
+      date: new Date().toLocaleDateString('vi-VN')
     };
 
     setExpenses([...expenses, newExpense]);
@@ -30,14 +31,22 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
-      <div className="relative py-3 sm:max-w-xl sm:mx-auto">
-        <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
-          <div className="max-w-md mx-auto">
-            <div className="divide-y divide-gray-200">
-              <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-                <h1 className="text-3xl font-bold mb-8 text-center text-gray-900">Quản lý chi tiêu</h1>
-                
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <header className="bg-white shadow">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold text-gray-900">Quản lý chi tiêu</h1>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Form Section */}
+            <div className="lg:col-span-1">
+              <div className="bg-white shadow rounded-lg p-6">
+                <h2 className="text-lg font-medium text-gray-900 mb-4">Thêm chi tiêu mới</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Mô tả</label>
@@ -46,17 +55,24 @@ function App() {
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      placeholder="Nhập mô tả chi tiêu"
                     />
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Số tiền</label>
-                    <input
-                      type="number"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    />
+                    <div className="mt-1 relative rounded-md shadow-sm">
+                      <input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        className="block w-full rounded-md border-gray-300 pl-3 pr-12 focus:border-indigo-500 focus:ring-indigo-500"
+                        placeholder="0"
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <span className="text-gray-500 sm:text-sm">đ</span>
+                      </div>
+                    </div>
                   </div>
                   
                   <button
@@ -66,30 +82,57 @@ function App() {
                     Thêm chi tiêu
                   </button>
                 </form>
+              </div>
+            </div>
 
-                <div className="mt-8">
-                  <h2 className="text-xl font-semibold mb-4">Danh sách chi tiêu</h2>
-                  <div className="space-y-2">
-                    {expenses.map(expense => (
-                      <div key={expense.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                        <span>{expense.description}</span>
-                        <span className="font-semibold">{expense.amount.toLocaleString('vi-VN')}đ</span>
+            {/* Expenses List Section */}
+            <div className="lg:col-span-2">
+              <div className="bg-white shadow rounded-lg">
+                <div className="px-4 py-5 sm:px-6">
+                  <h2 className="text-lg font-medium text-gray-900">Danh sách chi tiêu</h2>
+                </div>
+                <div className="border-t border-gray-200">
+                  <div className="divide-y divide-gray-200">
+                    {expenses.length === 0 ? (
+                      <div className="px-4 py-5 sm:px-6 text-center text-gray-500">
+                        Chưa có chi tiêu nào
                       </div>
-                    ))}
+                    ) : (
+                      expenses.map(expense => (
+                        <div key={expense.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {expense.description}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {expense.date}
+                              </p>
+                            </div>
+                            <div className="ml-4 flex-shrink-0">
+                              <p className="text-sm font-medium text-indigo-600">
+                                {expense.amount.toLocaleString('vi-VN')}đ
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
-                  
-                  <div className="mt-6 pt-4 border-t border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold">Tổng cộng</span>
-                      <span className="text-lg font-bold">{totalExpenses.toLocaleString('vi-VN')}đ</span>
-                    </div>
+                </div>
+                <div className="bg-gray-50 px-4 py-4 sm:px-6">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-gray-900">Tổng cộng</p>
+                    <p className="text-lg font-bold text-indigo-600">
+                      {totalExpenses.toLocaleString('vi-VN')}đ
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
