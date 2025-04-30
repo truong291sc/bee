@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import './App.css';
 import Login from './components/Login';
-import ExpenseForm from './components/ExpenseForm';
-import ExpenseList from './components/ExpenseList';
+import TransactionForm from './components/TransactionForm';
+import TransactionList from './components/TransactionList';
 import Statistics from './components/Statistics';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [expenses, setExpenses] = useState([]);
-  const [activeTab, setActiveTab] = useState('expenses');
+  const [transactions, setTransactions] = useState([]);
+  const [activeTab, setActiveTab] = useState('transactions');
 
-  const handleAddExpense = (newExpense) => {
-    setExpenses([...expenses, newExpense]);
+  const handleAddTransaction = (newTransaction) => {
+    setTransactions([...transactions, newTransaction]);
   };
 
-  const handleDeleteExpense = (id) => {
-    setExpenses(expenses.filter(expense => expense.id !== id));
+  const handleDeleteTransaction = (id) => {
+    setTransactions(transactions.filter(transaction => transaction.id !== id));
   };
 
   if (!isLoggedIn) {
@@ -27,7 +27,7 @@ function App() {
       {/* Header */}
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900">Quản lý chi tiêu</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Quản lý thu chi</h1>
         </div>
       </header>
 
@@ -39,14 +39,14 @@ function App() {
             <div className="border-b border-gray-200">
               <nav className="-mb-px flex space-x-8">
                 <button
-                  onClick={() => setActiveTab('expenses')}
+                  onClick={() => setActiveTab('transactions')}
                   className={`${
-                    activeTab === 'expenses'
+                    activeTab === 'transactions'
                       ? 'border-indigo-500 text-indigo-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
                 >
-                  Chi tiêu
+                  Giao dịch
                 </button>
                 <button
                   onClick={() => setActiveTab('statistics')}
@@ -63,19 +63,22 @@ function App() {
           </div>
 
           {/* Content */}
-          {activeTab === 'expenses' ? (
+          {activeTab === 'transactions' ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-1">
-                <ExpenseForm onAddExpense={handleAddExpense} />
+                <TransactionForm onAddTransaction={handleAddTransaction} />
               </div>
               <div className="lg:col-span-2">
-                <ExpenseList expenses={expenses} onDeleteExpense={handleDeleteExpense} />
+                <TransactionList 
+                  transactions={transactions} 
+                  onDeleteTransaction={handleDeleteTransaction} 
+                />
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="lg:col-span-2">
-                <Statistics expenses={expenses} />
+                <Statistics transactions={transactions} />
               </div>
             </div>
           )}
